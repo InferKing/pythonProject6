@@ -1,0 +1,95 @@
+{% extends 'base.html' %} {% block title %}Главная{% endblock %} 
+{% block content %}
+<div class="wrapper">
+  <div class="send-item">
+    <input type="text" class="send-text" />
+    <button class="send-data-btn">Добавить</button>
+  </div>
+  <div class="wrapper-data">
+    <div class="empty-data">Поздравляем, все задачи выполнены!</div>
+  </div>
+</div>
+<script>
+  var data;
+  document.addEventListener("DOMContentLoaded", function () {
+    var inputField = document.querySelector(".send-text");
+    var addButton = document.querySelector(".send-data-btn");
+    var wrapperElement = document.querySelector(".wrapper-data");
+    addButton.addEventListener("click", addPost);
+    
+    function loadData() {
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", "/load_data", true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.send();
+      xhr.onload = function () {
+        if (xhr.status == 200) {
+          data = JSON.parse(xhr.responseText);
+          console.log(data);
+          for (index in data) {
+            data[index] = JSON.parse(data[index]);
+            createItemHTML(data[index]);
+          }
+        } else {
+          console.log("Ошибка " + xhr.status + " : " + xhr.statusText);
+        }
+      };
+      xhr.onerror = function () {
+        console.log("Ошибка запроса");
+      };
+    }
+
+    function addPost() {
+      var xhr = new XMLHttpRequest();
+      xhr.open("PUT", "/add_post", true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.send(JSON.stringify(inputField.value));
+      xhr.onload = function () {
+        if (xhr.status == 200 || xhr.status == 302) {
+          data = JSON.parse(xhr.responseText);
+          for (index in data) {
+            data[index] = JSON.parse(data[index]);
+          }
+          createItemHTML(
+            data.reduce(function (prev, current) {
+              return (prev.id > current.id) ? prev : current;
+            })
+          );
+          toggleEmptyData();
+        }
+      }
+    }
+
+    function createItemHTML(cur_data) {
+      var divParent = document.createElement("div");
+      divParent.classList.add("list-body");
+      var textElement = document.createElement("div");
+      textElement.classList.add("list-text");
+      textElement.textContent = cur_data.content;
+      var buttonElement = document.createElement("button");
+      buttonElement.classList.add("delete-button");
+      buttonElement.onclick = function () {
+        var xhr = new XMLHttpRequest();
+        xhr.open("DELETE", "/delete_data", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(cur_data.id);
+        wrapperElement.removeChild(divParent);
+        toggleEmptyData();
+      }
+      divParent.appendChild(textElement);
+      divParent.appendChild(buttonElement);
+      wrapperElement.appendChild(divParent);
+    }
+
+    function toggleEmptyData() {
+      var result = document.querySelector(".list-body");
+      var data = document.querySelector(".empty-data");
+      data.style.display = (result === null) ? "block" : "none";
+    }
+
+    loadData();
+    toggleEmptyData();
+  });
+
+</script>
+{% endblock %}

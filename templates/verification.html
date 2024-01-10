@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Подтверждение{% endblock %}
+{% block content %}
+<div>Введите код подтверждения, отправленный вам на почту. </div>
+<form action="" method="post" novalidate>
+    {{ form.hidden_tag() }}
+    <div>
+        {{ form.code() }}
+    </div>
+    <div>
+        {{ form.submit() }}
+    </div>
+</form>
+{% endblock %}

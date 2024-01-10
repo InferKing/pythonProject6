@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Регистрация{% endblock %}
+{% block content %}
+<form action="" method="post" novalidate>
+    {{ form.hidden_tag() }}
+    <div>
+        {{ form.username.label }}<br>
+        {{ form.username() }}
+    </div>
+    <div>
+        {{ form.mail.label }}<br>
+        {{ form.mail() }}
+    </div>
+    <div>
+        {{ form.password.label }}<br>
+        {{ form.password() }}
+    </div>
+    <div>
+        {{ form.confirm.label }}<br>
+        {{ form.confirm() }}
+    </div>
+    <div>
+        {{ form.submit() }}
+    </div>
+</form>
+{% endblock %}
